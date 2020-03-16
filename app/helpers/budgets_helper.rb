@@ -93,4 +93,8 @@ module BudgetsHelper
       "hide"
     end
   end
+
+  def budget_single?(budget)
+    budget.groups.headings.count == 1
+  end
 end

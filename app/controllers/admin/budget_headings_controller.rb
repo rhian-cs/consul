@@ -7,6 +7,7 @@ class Admin::BudgetHeadingsController < Admin::BaseController
   before_action :load_group
   before_action :load_headings, only: [:index, :create]
   before_action :load_heading, except: [:new, :index, :create]
+  before_action :set_budget_mode, only: [:new, :create]
 
   def index
     @heading = @group.headings.new
@@ -22,7 +23,11 @@ class Admin::BudgetHeadingsController < Admin::BaseController
   def create
     @heading = @group.headings.new(budget_heading_params)
     if @heading.save
-      redirect_to headings_index, notice: t("admin.budget_headings.create.notice")
+      if @mode == "single"
+        redirect_to admin_budget_path(@heading.group.budget), notice: t("admin.budgets.create.notice")
+      else
+        redirect_to headings_index, notice: t("admin.budget_headings.create.notice")
+      end
     else
       render :new
     end
@@ -70,5 +75,17 @@ class Admin::BudgetHeadingsController < Admin::BaseController
     def budget_heading_params
       valid_attributes = [:price, :population, :allow_custom_content, :latitude, :longitude, :max_ballot_lines]
       params.require(:budget_heading).permit(*valid_attributes, translation_params(Budget::Heading))
+    end
+
+    def budget_mode_params
+      params.require(:budget).permit(:mode) if params.key?(:budget)
+    end
+
+    def set_budget_mode
+      if params[:mode] || budget_mode_params
+        @mode = params[:mode] || budget_mode_params[:mode]
+      else
+        @mode = "multiple"
+      end
     end
 end

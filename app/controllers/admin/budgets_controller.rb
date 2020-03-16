@@ -9,6 +9,7 @@ class Admin::BudgetsController < Admin::BaseController
 
   before_action :load_budget, except: [:index, :new, :create]
   before_action :load_staff, only: [:new, :create, :edit, :update, :show]
+  before_action :set_budget_mode, only: [:new, :create]
   load_and_authorize_resource
 
   def index
@@ -54,8 +55,13 @@ class Admin::BudgetsController < Admin::BaseController
 
   def create
     @budget = Budget.new(budget_params.merge(published: false))
+
     if @budget.save
-      redirect_to admin_budget_groups_path(@budget), notice: t("admin.budgets.create.notice")
+      if @mode == "single"
+        redirect_to new_admin_budget_group_path(@budget, mode: "single")
+      else
+        redirect_to edit_admin_budget_path(@budget), notice: t("admin.budgets.create.notice")
+      end
     else
       render :new
     end
@@ -88,6 +94,10 @@ class Admin::BudgetsController < Admin::BaseController
       params.require(:budget).permit(*valid_attributes, *report_attributes, translation_params(Budget))
     end
 
+    def budget_heading_params
+      params.require(:heading).permit(:mode) if params.key?(:heading)
+    end
+
     def load_budget
       @budget = Budget.find_by_slug_or_id! params[:id]
     end
@@ -103,5 +113,13 @@ class Admin::BudgetsController < Admin::BaseController
 
     def selected_group_id
       selected_group_params[:group_id]
+    end
+
+    def set_budget_mode
+      if params[:mode] || budget_heading_params
+        @mode = params[:mode] || budget_heading_params[:mode]
+      else
+        @mode = "multiple"
+      end
     end
 end

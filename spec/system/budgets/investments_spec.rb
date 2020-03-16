@@ -54,7 +54,7 @@ describe "Budget Investments" do
     unfeasible_investment = create(:budget_investment, :unfeasible, heading: heading)
 
     visit budget_path(budget)
-    click_link "More hospitals"
+    click_link "See all investments"
 
     expect(page).to have_selector("#budget-investments .budget-investment", count: 3)
     investments.each do |investment|
@@ -1235,7 +1235,10 @@ describe "Budget Investments" do
 
       first(:link, "Participatory budgeting").click
 
-      click_link "More hospitals"
+      # TODO: check
+      click_link "See all investments"
+      # click_link "List of all investment projects"
+      # click_link "Health"
 
       within("#budget_investment_#{investment1.id}") do
         expect(page).to have_content investment1.title

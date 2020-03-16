@@ -34,6 +34,54 @@ describe "Admin budgets", :admin do
       expect(page).to have_content "Accepting projects"
     end
 
+    scenario "Displaying budget information" do
+      budget_single = create(:budget, :accepting)
+      budget_multiple = create(:budget, :balloting)
+
+      heading = create(:budget_heading, budget: budget_single)
+      create(:budget_heading, budget: budget_multiple)
+      create(:budget_heading, budget: budget_multiple)
+
+      visit admin_budgets_path
+
+      within "#budget_#{budget_single.id}" do
+        expect(page).to have_content(budget_single.name)
+        expect(page).to have_content("Accepting projects")
+        expect(page).to have_content("Single heading")
+        expect(page).to have_content("(2/9)")
+        expect(page).to have_content("9 months")
+        expect(page).to have_content("#{budget_single.phases.first.starts_at.to_date} 00:00 - "\
+                                     "#{budget_single.phases.last.ends_at.to_date - 1} 23:59")
+      end
+
+      within "#budget_#{budget_multiple.id}" do
+        expect(page).to have_content(budget_multiple.name)
+        expect(page).to have_content("Voting projects")
+        expect(page).to have_content("Multiple headings")
+        expect(page).to have_content("(7/9)")
+        expect(page).to have_content("9 months")
+        expect(page).to have_content("#{budget_multiple.phases.first.starts_at.to_date} 00:00 - "\
+                                     "#{budget_multiple.phases.last.ends_at.to_date - 1} 23:59")
+      end
+    end
+
+    scenario "Displaying budget current phase information for non common cases" do
+      budget_without_enabled_phases = create(:budget, :accepting)
+      budget_without_enabled_phases.phases.each { |phase| phase.update!(enabled: false) }
+      budget_in_a_not_enabled_phase = create(:budget, :accepting)
+      budget_in_a_not_enabled_phase.phases.accepting.update!(enabled: false)
+
+      visit admin_budgets_path
+
+      within "#budget_#{budget_without_enabled_phases.id}" do
+        expect(page).to have_content("(0/0)")
+      end
+
+      within "#budget_#{budget_in_a_not_enabled_phase.id}" do
+        expect(page).to have_content("(0/8)")
+      end
+    end
+
     scenario "Filters by phase" do
       create(:budget, :drafting, name: "Unpublished budget")
       create(:budget, :accepting, name: "Accepting budget")
@@ -115,7 +163,8 @@ describe "Admin budgets", :admin do
   context "New" do
     scenario "Create budget - Knapsack voting (default)" do
       visit admin_budgets_path
-      click_link "Create new budget"
+      click_button "Create new budget"
+      click_link "Create single heading budget"
 
       fill_in "Name", with: "M30 - Summer campaign"
       click_button "Continue to groups"
@@ -132,7 +181,8 @@ describe "Admin budgets", :admin do
       admin = Administrator.first
 
       visit admin_budgets_path
-      click_link "Create new budget"
+      click_button "Create new budget"
+      click_link "Create single heading budget"
 
       fill_in "Name", with: "M30 - Summer campaign"
       select "Approval", from: "Final voting style"
@@ -182,7 +232,8 @@ describe "Admin budgets", :admin do
   context "Create" do
     scenario "A new budget is always created in draft mode" do
       visit admin_budgets_path
-      click_link "Create new budget"
+      click_button "Create new budget"
+      click_link "Create multiple headings budget"
 
       fill_in "Name", with: "M30 - Summer campaign"
 
@@ -193,6 +244,35 @@ describe "Admin budgets", :admin do
       expect(page).to have_content "This participatory budget is in draft mode"
       expect(page).to have_link "Preview budget"
       expect(page).to have_link "Publish budget"
+    end
+
+    pending "Test backend and frontend for new optional 'Main call to action' feature"
+
+    context "Single heading budget" do
+      scenario "Is created by phases" do
+        visit admin_budgets_path
+        click_button "Create new budget"
+        click_link "Create single heading budget"
+
+        fill_in "Name", with: "Single heading budget"
+        click_button "Continue"
+
+        expect(page).to have_field "Group name", with: "Single heading budget"
+        click_button "Continue"
+
+        fill_in "Heading name", with: "Heading name"
+        fill_in "Amount", with: "1000000"
+        click_button "Continue"
+
+        expect(page).to have_content "New participatory budget created successfully!"
+
+        budget = Budget.last
+        expect(budget.name).to eq "Single heading budget"
+        expect(budget.groups.count).to be 1
+        expect(budget.groups.first.name).to eq "Single heading budget"
+        expect(budget.groups.first.headings.count).to be 1
+        expect(budget.groups.first.headings.first.name).to eq "Heading name"
+      end
     end
   end
 
@@ -281,7 +361,7 @@ describe "Admin budgets", :admin do
 
         visit edit_admin_budget_path(budget)
 
-        expect(page).to have_select "Phase", selected: "Selecting projects"
+        expect(page).to have_select "Active phase", selected: "Selecting projects"
 
         expect(page).to have_table "Phases", with_cols: [
           [
