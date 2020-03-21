@@ -171,7 +171,8 @@ describe "Admin budgets", :admin do
 
       expect(page).to have_content "New participatory budget created successfully!"
 
-      click_link "Go back to budgets"
+      visit admin_budgets_path
+      click_link "Edit budget"
 
       expect(page).to have_field "Name", with: "M30 - Summer campaign"
       expect(page).to have_select "Final voting style", selected: "Knapsack"
@@ -190,7 +191,9 @@ describe "Admin budgets", :admin do
 
       expect(page).to have_content "New participatory budget created successfully!"
 
-      click_link "Go back to budgets"
+      visit admin_budgets_path
+      click_link "Edit budget"
+
       expect(page).to have_field "Name", with: "M30 - Summer campaign"
       expect(page).to have_select "Final voting style", selected: "Approval"
 
@@ -246,8 +249,6 @@ describe "Admin budgets", :admin do
       expect(page).to have_link "Publish budget"
     end
 
-    pending "Test backend and frontend for new optional 'Main call to action' feature"
-
     context "Single heading budget" do
       scenario "Is created by phases" do
         visit admin_budgets_path
@@ -255,10 +256,10 @@ describe "Admin budgets", :admin do
         click_link "Create single heading budget"
 
         fill_in "Name", with: "Single heading budget"
-        click_button "Continue"
+        click_button "Continue to groups"
 
         expect(page).to have_field "Group name", with: "Single heading budget"
-        click_button "Continue"
+        click_button "Continue to headings"
 
         fill_in "Heading name", with: "Heading name"
         fill_in "Amount", with: "1000000"
@@ -434,18 +435,6 @@ describe "Admin budgets", :admin do
           expect(page).to have_link "Delete heading #{heading.name}"
         end
       end
-    end
-
-    scenario "Add group from edit view" do
-      visit edit_admin_budget_path(budget)
-
-      click_link "Add group"
-
-      fill_in "Group name", with: "New group"
-      click_button "Create new group"
-
-      visit edit_admin_budget_path(budget)
-      expect(page).to have_content "New group"
     end
 
     scenario "Add heading from edit view" do

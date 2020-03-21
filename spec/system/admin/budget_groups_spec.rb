@@ -100,13 +100,7 @@ describe "Admin budget groups", :admin do
 
       expect(page).to have_content "Group created successfully!"
 
-      within all("thead th")[1] do
-        expect(page).to have_content("Maximum number of headings in which a user can vote")
-      end
-
-      within "tbody tr" do
-        within all("td")[1] { expect(page.text).to eq "1" }
-      end
+      expect(page).to have_content("Maximum number of headings in which a user can vote 1")
     end
 
     scenario "Group name is mandatory" do

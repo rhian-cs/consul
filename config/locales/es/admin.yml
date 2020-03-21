@@ -184,7 +184,7 @@ es:
       create:
         notice: "¡Grupo creado con éxito!"
         button:
-          continue: "Continuar a partidas"
+          continue: "Continuar a grupos"
       update:
         notice: "Grupo actualizado"
       destroy:
@@ -196,9 +196,12 @@ es:
         max_votable_headings_info: "Solo se aplica en la fase de apoyos. Durante la votación final un usuario solo puede votar en una partida por grupo."
         submit: "Guardar grupo"
       index:
-        back: "Volver a presupuestos"
-        help: "Los grupos sirven para organizar las partidas del presupuesto. Después de que un grupo sea creado y éste contenga partidas, es posible determinar el número de partidas a las que un usuario puede votar por grupo."
+        back: "Volver al presupuesto"
+        multiple:
+          help: "Los grupos sirven para organizar las partidas del presupuesto. Después de que un grupo sea creado y éste contenga partidas, es posible determinar el número de partidas a las que un usuario puede votar por grupo."
         new_button: "Añadir un grupo nuevo"
+        single:
+          help: "Los grupos sirven para organizar las partidas del presupuesto, como este presupuesto sólo contendrá una partida, se puede usar el mismo nombre y éste no aparecerá en ninguna parte. Puedes continuar con el siguiente paso."
     budget_headings:
       name: Nombre de la partida
       price: Cantidad de dinero

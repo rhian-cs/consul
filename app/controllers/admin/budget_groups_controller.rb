@@ -6,18 +6,18 @@ class Admin::BudgetGroupsController < Admin::BaseController
   before_action :load_budget
   before_action :load_groups, only: [:index, :create]
   before_action :load_group, except: [:new, :index, :create]
-  before_action :set_budget_mode, only: [:new, :create]
+  before_action :set_budget_mode, only: [:index, :create]
 
   def index
-    @group = @budget.groups.new
-  end
-
-  def new
     if @mode == "single"
       @group = @budget.groups.new("name_#{I18n.locale}" => @budget.name)
     else
       @group = @budget.groups.new
     end
+  end
+
+  def new
+    @group = @budget.groups.new
   end
 
   def edit
@@ -27,7 +27,7 @@ class Admin::BudgetGroupsController < Admin::BaseController
     @group = @budget.groups.new(budget_group_params)
     if @group.save
       if @mode == "single"
-        redirect_to new_admin_budget_group_heading_path(@group.budget, @group, mode: "single")
+        redirect_to new_admin_budget_group_heading_path(@group.budget, @group, url_params)
       else
         redirect_to groups_index, notice: t("admin.budget_groups.create.notice")
       end
@@ -67,8 +67,12 @@ class Admin::BudgetGroupsController < Admin::BaseController
       @group = @budget.groups.find_by_slug_or_id! params[:id]
     end
 
+    def url_params
+      @mode.present? ? { mode: @mode } : {}
+    end
+
     def groups_index
-      admin_budget_groups_path(@budget)
+      admin_budget_groups_path(@budget, url_params)
     end
 
     def budget_group_params
@@ -81,10 +85,8 @@ class Admin::BudgetGroupsController < Admin::BaseController
     end
 
     def set_budget_mode
-      if params[:mode] || budget_heading_params
+      if params[:mode] || budget_heading_params.present?
         @mode = params[:mode] || budget_heading_params[:mode]
-      else
-        @mode = "multiple"
       end
     end
 end
