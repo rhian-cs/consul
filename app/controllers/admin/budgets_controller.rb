@@ -9,7 +9,7 @@ class Admin::BudgetsController < Admin::BaseController
 
   before_action :load_budget, except: [:index, :new, :create]
   before_action :load_staff, only: [:new, :create, :edit, :update, :show]
-  before_action :set_budget_mode, only: [:new, :create]
+  before_action :set_budget_mode, only: [:new, :create, :switch_group]
   load_and_authorize_resource
 
   def index
@@ -21,6 +21,7 @@ class Admin::BudgetsController < Admin::BaseController
   end
 
   def new
+    @mode ||= "multiple"
   end
 
   def edit
@@ -42,7 +43,7 @@ class Admin::BudgetsController < Admin::BaseController
   end
 
   def switch_group
-    redirect_to admin_budget_group_headings_path(@budget, selected_group_id)
+    redirect_to admin_budget_group_headings_path(@budget, selected_group_id, url_params)
   end
 
   def update
@@ -103,6 +104,10 @@ class Admin::BudgetsController < Admin::BaseController
       @valuators = Valuator.includes(:user).order(description: :asc).order("users.email ASC")
     end
 
+    def url_params
+      @mode.present? ? { mode: @mode } : {}
+    end
+
     def selected_group_params
       params.require(:budget).permit(:group_id) if params.key?(:budget)
     end
@@ -112,10 +117,8 @@ class Admin::BudgetsController < Admin::BaseController
     end
 
     def set_budget_mode
-      if params[:mode] || budget_heading_params
+      if params[:mode] || budget_heading_params.present?
         @mode = params[:mode] || budget_heading_params[:mode]
-      else
-        @mode = "multiple"
       end
     end
 end

@@ -230,8 +230,11 @@ es:
         submit: "Guardar partida"
       index:
         back: "Volver a grupos"
-        help: "Las partidas sirven para dividir el dinero del presupuesto participativo. Aquí puedes ir añadiendo partidas para cada grupo y establecer la cantidad de dinero que se gastará en cada partida."
+        multiple:
+          help: "Las partidas sirven para dividir el dinero del presupuesto participativo. Aquí puedes ir añadiendo partidas para cada grupo y establecer la cantidad de dinero que se gastará en cada partida."
         new_button: "Añadir una partida nueva"
+        single:
+          help: "Las partidas sirven para dividir el dinero del presupuesto participativo. Como este presupuesto solo tendrá una partida aquí podrás establecer la cantidad de dinero que se gastará en este presupuesto participativo."
         showing_headings_from_group: "Mostrando las partidas del grupo:"
     budget_phases:
       edit:
