@@ -88,12 +88,6 @@ module BudgetsHelper
     end
   end
 
-  def class_for_form(resource)
-    unless resource.errors.any?
-      "hide"
-    end
-  end
-
   def budget_single?(budget)
     budget.groups.headings.count == 1
   end
