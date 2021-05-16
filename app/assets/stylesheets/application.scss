@@ -31,7 +31,6 @@
 @import "notification_item";
 @import "community";
 @import "stats";
-@import "custom";
 @import "sticky_overrides";
 @import "tags";
 @import "admin/**/*";
@@ -40,3 +39,5 @@
 @import "sdg_management/*";
 @import "sdg_management/**/*";
 @import "widgets/**/*";
+
+@import "custom";
