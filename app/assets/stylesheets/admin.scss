@@ -163,10 +163,6 @@ $table-header:   #ecf1f6;
     color: $admin-color;
   }
 
-  .dropdown.menu > .is-dropdown-submenu-parent > a::after {
-    border-color: #000 transparent transparent;
-  }
-
   .fieldset {
 
     select {
