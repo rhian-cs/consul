@@ -10,6 +10,8 @@ class Admin::BudgetsController < Admin::BaseController
   before_action :load_budget, except: [:index, :new, :create]
   before_action :load_staff, only: [:new, :create, :edit, :update, :show]
   before_action :set_budget_mode, only: [:new, :create, :switch_group]
+  before_action :set_url_params, only: [:edit, :switch_group]
+
   load_and_authorize_resource
 
   def index
@@ -43,7 +45,7 @@ class Admin::BudgetsController < Admin::BaseController
   end
 
   def switch_group
-    redirect_to admin_budget_group_headings_path(@budget, selected_group_id, url_params)
+    redirect_to admin_budget_group_headings_path(@budget, selected_group_id, @url_params)
   end
 
   def update
@@ -106,6 +108,10 @@ class Admin::BudgetsController < Admin::BaseController
 
     def url_params
       @mode.present? ? { mode: @mode } : {}
+    end
+
+    def set_url_params
+      @url_params = url_params
     end
 
     def selected_group_params
